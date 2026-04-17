@@ -1,10 +1,9 @@
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const nameRoutes = require("./src/routes/profile.routes");
-const connectDB = require("./src/config/db");
-
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import dotenv from "dotenv";
+import nameRoutes from "./src/routes/profile.routes.js";
+import connectDB from "./src/config/db.js";
 
 dotenv.config();
 
@@ -17,17 +16,10 @@ app.use(cors({
     origin: "*",
 }));
 
-
-
 app.use('/api', nameRoutes);
 
-
-
-
-
-app.use("/", (req,res) =>{
+app.get("/", (req,res) =>{
     res.json({message: "Welcome to NameIntel API"});
 })
 
-
-module.exports = app;
+export default app;

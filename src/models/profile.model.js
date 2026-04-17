@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 
 const profileSchema = new mongoose.Schema({
     id: {
@@ -10,7 +9,8 @@ const profileSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     gender: {
         type: String,
@@ -30,6 +30,7 @@ const profileSchema = new mongoose.Schema({
     },
     age_group: {
         type: String,
+        required: true
     },
     country_id:{
         type: String,
@@ -37,13 +38,12 @@ const profileSchema = new mongoose.Schema({
     },
     country_probability: {
         type: Number,
+        required: true
     },
     created_at: {
-        type: Date,
-        default: Date.now().toISOString()
+        type: String,
+        required: true
     }
 });
 
-
-
-module.exports = mongoose.model("Profile", profileSchema);
+export default mongoose.model("Profile", profileSchema);

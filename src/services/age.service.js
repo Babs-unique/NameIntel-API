@@ -5,7 +5,8 @@ const getAge = async (name) => {
         const response = await axios.get(`https://api.agify.io?name=${name}`);
         return response.data;
     }catch(error){
-        console.error(error);
+        console.error('Agify error:', error.message);
+        throw new Error('Unable to get age');
     }
 }
 

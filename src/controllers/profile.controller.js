@@ -34,36 +34,62 @@ const createProfile = async (req, res) => {
     }
 
     try {
-        const genderData = await classifyGender(nameLowerCase);
-        const ageData = await getAge(nameLowerCase);
-        const nationalityData = await getNationality(nameLowerCase);
-
-        if (!genderData.gender || genderData.count === 0 || genderData.count === null) {
+        let genderData, ageData, nationalityData;
+        
+        // Call APIs with individual error handling
+        try {
+            genderData = await classifyGender(nameLowerCase);
+        } catch (error) {
             return res.status(502).json({ status: "error", message: "Genderize returned an invalid response" });
         }
 
-        if (ageData.age === null) {
+        try {
+            ageData = await getAge(nameLowerCase);
+        } catch (error) {
             return res.status(502).json({ status: "error", message: "Agify returned an invalid response" });
         }
-        if (!nationalityData.country || nationalityData.country.length === 0) {
+
+        try {
+            nationalityData = await getNationality(nameLowerCase);
+        } catch (error) {
             return res.status(502).json({ status: "error", message: "Nationalize returned an invalid response" });
         }
 
+        // Validate Genderize response
+        if (!genderData || !genderData.gender || genderData.count === 0 || genderData.count === null) {
+            return res.status(502).json({ status: "error", message: "Genderize returned an invalid response" });
+        }
 
+        // Validate Agify response
+        if (!ageData || ageData.age === null || ageData.age === undefined) {
+            return res.status(502).json({ status: "error", message: "Agify returned an invalid response" });
+        }
+
+        // Validate Nationalize response
+        if (!nationalityData || !nationalityData.country || nationalityData.country.length === 0) {
+            return res.status(502).json({ status: "error", message: "Nationalize returned an invalid response" });
+        }
+
+        // Process data
         const formattedGenderData = genderFormat(genderData);
         const ageGroup = classifyAgeGroup(ageData.age);
         const country = selectCountry(nationalityData);
 
+        // Validate processed data
+        if (!formattedGenderData || !ageGroup || !country) {
+            return res.status(502).json({ status: "error", message: "Failed to process demographic data" });
+        }
 
+        // Create new profile
         const profileData = new Profile({
             id: generateUUID(),
             name: nameLowerCase,
-            gender: formattedGenderData.gender,
+            gender: formattedGenderData.gender.toLowerCase(),
             gender_probability: formattedGenderData.gender_probability,
             sample_size: formattedGenderData.sample_size,
             age: ageData.age,
-            age_group: ageGroup,
-            country_id: country.country_id,
+            age_group: ageGroup.toLowerCase(),
+            country_id: country.country_id.toUpperCase(),
             country_probability: country.country_probability,
             created_at: new Date().toISOString()
         });
@@ -74,7 +100,7 @@ const createProfile = async (req, res) => {
             data: savedProfile.toObject()
         });
     } catch (error) {
-        console.error(error);
+        console.error("Error creating profile:", error.message);
         return res.status(500).json({ status: "error", message: "Internal server error" });
     }
 };

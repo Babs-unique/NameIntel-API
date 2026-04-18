@@ -5,7 +5,7 @@ const classifyGender = async (name) => {
         const response = await axios.get(`https://api.genderize.io?name=${name}`);
         return response.data;
     }catch(error){
-        console.error(error);
+        console.error('Genderize error:', error.message);
         throw new Error('Unable to classify gender');
     }
 }

@@ -1,5 +1,5 @@
 const countryCodes = (result) => {
-    if(!result || !result.country.length === 0){
+    if(!result || !result.country || result.country.length === 0){
         return null;
     }
     const topCountry = result.country.reduce((max, country) => {

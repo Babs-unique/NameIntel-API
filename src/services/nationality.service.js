@@ -5,7 +5,7 @@ const getNationality = async (name) => {
         const response = await axios.get(`https://api.nationalize.io?name=${name}`);
         return response.data;
     }catch(error){
-        console.error(error);
+        console.error('Nationalize error:', error.message);
         throw new Error('Unable to get nationality');
     }
 }

@@ -6,7 +6,7 @@ const parseNaturalLanguageQuery = (query) => {
     const q = query.toLowerCase().trim();
     const filters = {};
 
-    const hasMale =/\b(male|man|men|boy|boys)\b/.test(q);
+    const hasMale =/\b(male|man|men|boy|boys|males)\b/.test(q);
     const hasFemale = /\b(female|woman|women|girl|girls|females)\b/.test(q)
 
     if (hasMale && !hasFemale) {

@@ -136,7 +136,7 @@ const getProfiles = async (req, res) => {
 
         if (isNaN(page) || page < 1) page = 1;
         if (isNaN(limit) || limit < 1) limit = 10;
-        if (limit > 50) limit = 50; // Max limit of 50
+        if (limit > 50) limit = 50;
         
         const startIndex = (page - 1) * limit;
 
@@ -251,7 +251,6 @@ const searchProfiles = async (req, res) => {
         
         const startIndex = (page - 1) * limit;
 
-        // Execute query
         const profiles = await Profile.find(filters)
             .skip(startIndex)
             .limit(limit)

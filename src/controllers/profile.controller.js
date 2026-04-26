@@ -12,6 +12,118 @@ import en from "i18n-iso-countries/langs/en.json" with { type: "json" };
 
 countries.registerLocale(en);
 
+const buildQueryFilter = (queryParams) => {
+    const { gender, age_group, country_id, min_age, max_age, min_gender_probability, min_country_probability } = queryParams;
+    const filter = {};
+
+    if (gender) {
+        if (typeof gender !== 'string') {
+            throw new Error("Invalid gender parameter");
+        }
+        filter.gender = gender.toLowerCase();
+    }
+
+    if (age_group) {
+        if (typeof age_group !== 'string') {
+            throw new Error("Invalid age_group parameter");
+        }
+        filter.age_group = age_group.toLowerCase();
+    }
+
+    if (country_id) {
+        if (typeof country_id !== 'string') {
+            throw new Error("Invalid country_id parameter");
+        }
+        filter.country_id = country_id.toUpperCase();
+    }
+
+    if (min_age !== undefined) {
+        const minAgeNum = parseInt(min_age);
+        if (isNaN(minAgeNum)) {
+            throw new Error("Invalid min_age parameter");
+        }
+        filter.age = { ...filter.age, $gte: minAgeNum };
+    }
+
+    if (max_age !== undefined) {
+        const maxAgeNum = parseInt(max_age);
+        if (isNaN(maxAgeNum)) {
+            throw new Error("Invalid max_age parameter");
+        }
+        filter.age = { ...filter.age, $lte: maxAgeNum };
+    }
+
+    if (min_gender_probability !== undefined) {
+        const minGenderProb = parseFloat(min_gender_probability);
+        if (isNaN(minGenderProb)) {
+            throw new Error("Invalid min_gender_probability parameter");
+        }
+        filter.gender_probability = { ...filter.gender_probability, $gte: minGenderProb };
+    }
+
+    if (min_country_probability !== undefined) {
+        const minCountryProb = parseFloat(min_country_probability);
+        if (isNaN(minCountryProb)) {
+            throw new Error("Invalid min_country_probability parameter");
+        }
+        filter.country_probability = { ...filter.country_probability, $gte: minCountryProb };
+    }
+
+    return filter;
+};
+
+const buildSortObject = (sort_by, order) => {
+    let sortObj = { created_at: -1 };
+
+    if (sort_by) {
+        if (!['age', 'created_at', 'gender_probability'].includes(sort_by)) {
+            throw new Error("Invalid sort_by parameter");
+        }
+        const sortOrder = order === 'asc' ? 1 : -1;
+        sortObj = { [sort_by]: sortOrder };
+    } else if (order) {
+        throw new Error("order parameter requires sort_by");
+    }
+
+    return sortObj;
+};
+
+const escapeCSVField = (field) => {
+    if (field === null || field === undefined) {
+        return '';
+    }
+
+    const fieldStr = String(field);
+    if (fieldStr.includes(',') || fieldStr.includes('"') || fieldStr.includes('\n')) {
+        return `"${fieldStr.replace(/"/g, '""')}"`;
+    }
+    return fieldStr;
+};
+
+const generateCSV = (profiles) => {
+    const headers = ['id', 'name', 'gender', 'gender_probability', 'age', 'age_group', 'country_id', 'country_name', 'country_probability', 'created_at'];
+    
+    const csvHeader = headers.map(h => escapeCSVField(h)).join(',');
+    
+    const csvRows = profiles.map(profile => {
+        const row = [
+            profile.id,
+            profile.name,
+            profile.gender,
+            profile.gender_probability,
+            profile.age,
+            profile.age_group,
+            profile.country_id,
+            profile.country_name,
+            profile.country_probability,
+            profile.created_at
+        ];
+        return row.map(field => escapeCSVField(field)).join(',');
+    });
+
+    return [csvHeader, ...csvRows].join('\n');
+};
+
 const createProfile = async (req, res) => {
     const { name } = req.body;
 
@@ -129,7 +241,7 @@ const getProfileById = async (req, res) => {
 
 const getProfiles = async (req, res) => {
     try {
-        const { gender, age_group, country_id, min_age, max_age, min_gender_probability, min_country_probability, sort_by, order } = req.query;
+        const { sort_by, order } = req.query;
         
         let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 10;
@@ -140,71 +252,8 @@ const getProfiles = async (req, res) => {
         
         const startIndex = (page - 1) * limit;
 
-        const filter = {};
-        
-        if (gender) {
-            if (typeof gender !== 'string') {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.gender = gender.toLowerCase();
-        }
-        
-        if (age_group) {
-            if (typeof age_group !== 'string') {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.age_group = age_group.toLowerCase();
-        }
-        
-        if (country_id) {
-            if (typeof country_id !== 'string') {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.country_id = country_id.toUpperCase();
-        }
-        
-        if (min_age !== undefined) {
-            const minAgeNum = parseInt(min_age);
-            if (isNaN(minAgeNum)) {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.age = { ...filter.age, $gte: minAgeNum };
-        }
-        
-        if (max_age !== undefined) {
-            const maxAgeNum = parseInt(max_age);
-            if (isNaN(maxAgeNum)) {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.age = { ...filter.age, $lte: maxAgeNum };
-        }
-        
-        if (min_gender_probability !== undefined) {
-            const minGenderProb = parseFloat(min_gender_probability);
-            if (isNaN(minGenderProb)) {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.gender_probability = { ...filter.gender_probability, $gte: minGenderProb };
-        }
-        
-        if (min_country_probability !== undefined) {
-            const minCountryProb = parseFloat(min_country_probability);
-            if (isNaN(minCountryProb)) {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            filter.country_probability = { ...filter.country_probability, $gte: minCountryProb };
-        }
-
-        let sortObj = { created_at: -1 };
-        if (sort_by) {
-            if (!['age', 'created_at', 'gender_probability'].includes(sort_by)) {
-                return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-            }
-            const sortOrder = order === 'asc' ? 1 : -1;
-            sortObj = { [sort_by]: sortOrder };
-        } else if (order) {
-            return res.status(422).json({ status: "error", message: "Invalid query parameters" });
-        }
+        const filter = buildQueryFilter(req.query);
+        const sortObj = buildSortObject(sort_by, order);
 
         const profiles = await Profile.find(filter)
             .skip(startIndex)
@@ -218,11 +267,17 @@ const getProfiles = async (req, res) => {
             page,
             limit,
             total,
+            total_pages: Math.ceil(total / limit),
+            links: {
+                self: `/api/profiles?page=${page}&limit=${limit}`,
+                next: page * limit < total ? `/api/profiles?page=${page + 1}&limit=${limit}` : null,
+                prev : page > 1 ? `/api/profiles?page=${page - 1}&limit=${limit}` : null
+            },
             data: profiles.map(p => p.toObject())
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ status: "error", message: "Internal server error" });
+        return res.status(500).json({ status: "error", message: "Invalid query parameters" });
     }
 };
 
@@ -271,6 +326,45 @@ const searchProfiles = async (req, res) => {
     }
 };
 
+const exportProfiles = async (req, res) => {
+    try {
+        const { sort_by, order, format } = req.query;
+
+        if (format && format !== 'csv') {
+            return res.status(400).json({ status: "error", message: "Only CSV format is supported" });
+        }
+
+        const filter = buildQueryFilter(req.query);
+        const sortObj = buildSortObject(sort_by, order);
+
+        const profiles = await Profile.find(filter).sort(sortObj);
+
+        if (profiles.length === 0) {
+            return res.status(200).set({
+                'Content-Type': 'text/csv',
+                'Content-Disposition': `attachment; filename="profiles_${Date.now()}.csv"`
+            }).send('id,name,gender,gender_probability,age,age_group,country_id,country_name,country_probability,created_at\n');
+        }
+
+        const csv = generateCSV(profiles.map(p => p.toObject()));
+
+        const timestamp = Date.now();
+        res.set({
+            'Content-Type': 'text/csv',
+            'Content-Disposition': `attachment; filename="profiles_${timestamp}.csv"`,
+            'Content-Length': Buffer.byteLength(csv, 'utf-8')
+        });
+
+        return res.status(200).send(csv);
+    } catch (error) {
+        console.error(error);
+        if (error.message.includes('Invalid')) {
+            return res.status(422).json({ status: "error", message: error.message });
+        }
+        return res.status(500).json({ status: "error", message: "Internal server error" });
+    }
+};
+
 const deleteProfile = async (req, res) => {
     const { id } = req.params;
 
@@ -300,4 +394,4 @@ const deleteProfile = async (req, res) => {
 
 
 
-export { createProfile, getProfileById, getProfiles, deleteProfile, searchProfiles };
+export { createProfile, getProfileById, getProfiles, deleteProfile, searchProfiles, exportProfiles };

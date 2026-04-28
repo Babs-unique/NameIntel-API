@@ -14,10 +14,20 @@ const initiateGitHubAuth = (req, res) => {
     const codeChallenge = generateCodeChallenge(codeVerifier);
     const state = generateState();
 
-    pkceStore.set(state, codeVerifier);
+    // Store the code verifier and challenge for later verification
+    pkceStore.set(state, { codeVerifier, codeChallenge });
 
-    const authUrl = `${githubConfig.authorizationUrl}?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=${env.redirectUri}&scope=read:user&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-    res.redirect(authUrl);
+    const authUrl = `${githubConfig.authorizationUrl}?client_id=${env.githubClientId}&redirect_uri=${env.redirectUri}&scope=read:user&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+    
+    // Return JSON for CLI/programmatic clients
+    // Clients should open this URL in a browser
+    res.json({
+        success: true,
+        message: "Authorization URL generated successfully",
+        authorizationUrl: authUrl,
+        state: state,
+        codeVerifier: codeVerifier
+    });
 }
 
 const handleGitHubCallback = async (req, res) => {
@@ -28,12 +38,26 @@ const handleGitHubCallback = async (req, res) => {
             message: "Invalid state parameter",
         });
     }
-    const codeVerifier = pkceStore.get(state);
+    
+    // Retrieve the stored code verifier and challenge
+    const pkceData = pkceStore.get(state);
+    if (!pkceData) {
+        return res.status(400).json({
+            success: false,
+            message: "PKCE data not found. State may have expired."
+        });
+    }
+    
+    const codeVerifier = pkceData.codeVerifier;
 
     try{
         const accessToken = await getGitHubAccessToken(code, codeVerifier);
         const githubUser = await getGitHubUser(accessToken);
         const authResult = await userLogin(githubUser);
+        
+        // Clean up the stored PKCE data after successful use
+        pkceStore.delete(state);
+        
         res.json({ 
             success: true,
             message: "Authentication successful",

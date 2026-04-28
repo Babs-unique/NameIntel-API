@@ -1,4 +1,4 @@
-import  { verifyToken } from '../utils/jwt.js';
+import  { verifyAccessToken } from '../utils/jwt.js';
 
 
 const authMiddleware = async (req, res, next) => {
@@ -18,7 +18,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     try {
-        const decoded = await verifyToken(token);
+        const decoded = await verifyAccessToken(token);
         req.user = decoded;
         next();
     } catch (error) {

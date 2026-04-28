@@ -1,6 +1,6 @@
-import tokenModel from "../models/token.model";
-import User from "../models/user.model";
-import { generateAccessToken,generateRefreshToken, verifyRefreshToken} from "../utils/jwt";
+import tokenModel from "../models/token.model.js";
+import User from "../models/user.model.js";
+import { generateAccessToken,generateRefreshToken, verifyRefreshToken} from "../utils/jwt.js";
 
 
 const userLogin = async (githubUser) => {

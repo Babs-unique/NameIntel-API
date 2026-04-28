@@ -1,9 +1,9 @@
-import { githubConfig } from "../config/github";
+import { githubConfig } from "../config/github.js";
 import env from "../config/env.js";
-import { generateCodeChallenge , generateCodeVerifier } from "../utils/pkce";
+import { generateCodeChallenge , generateCodeVerifier } from "../utils/pkce.js";
 import { getGitHubAccessToken, getGitHubUser } from "../services/github.service.js";
 import { userLogin, refreshToken, logout } from "../services/auth.service.js";
-import { validateState, generateState } from "../utils/state";
+import { validateState, generateState } from "../utils/state.js";
 
 const pkceStore = new Map();
 

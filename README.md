@@ -1,4 +1,4 @@
-# NameIntel API 🎯
+# Inighta API 🎯
 
 A modern RESTful API service that enriches person names with demographic intelligence. By integrating with free, public APIs, this service extracts and structures gender, age, and nationality information into a clean, queryable database.
 
@@ -54,7 +54,7 @@ A modern RESTful API service that enriches person names with demographic intelli
 1. **Clone and Install**
    ```bash
    git clone <repo-url>
-   cd "NameIntel API"
+   cd "Inighta API"
    npm install
    ```
 
@@ -66,7 +66,7 @@ A modern RESTful API service that enriches person names with demographic intelli
    Edit `.env`:
    ```
    PORT=3000
-   MONGO_URI=mongodb://localhost:27017/nameintel
+   MONGO_URI=mongodb://localhost:27017/inighta
    NODE_ENV=development
    ```
 
@@ -412,7 +412,7 @@ curl -X DELETE http://localhost:3000/api/profiles/b3f9c1e2-7d4a-4c91-9c2a-1f0a8e
 ## 📂 Project Structure
 
 ```
-NameIntel API/
+Inighta API/
 ├── src/
 │   ├── config/
 │   │   └── db.js                 # MongoDB connection

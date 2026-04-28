@@ -8,10 +8,12 @@ import nameRoutes from "./src/routes/profile.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import connectDB from "./src/config/db.js";
 import checkVersion from "./src/middleware/versionMiddleware.js";
+import logger from "./src/middleware/logger.middleware.js";
 dotenv.config();
 
 const app = express();
 connectDB();
+app.use(logger);
 
 const authLimiter = rateLimiter({
     windowMs: 60 * 1000, 

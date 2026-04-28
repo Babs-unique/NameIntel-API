@@ -4,8 +4,7 @@ import {
     initiateGitHubAuth,
     handleGitHubCallback,
     refreshAccessToken,
-    logout,
-    whoami
+    logoutUser,
 } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -14,7 +13,6 @@ const router = express.Router();
 router.get('/github', initiateGitHubAuth);
 router.get('/github/callback', handleGitHubCallback);
 router.post('/refresh', refreshAccessToken);
-router.post('/logout', logout);
-router.get('/whoami', authenticate, whoami);
+router.post('/logout', logoutUser);
 
 export default router;

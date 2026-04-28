@@ -5,7 +5,7 @@ import { getGitHubAccessToken, getGitHubUser } from "../services/github.service.
 import { userLogin, refreshToken, logout } from "../services/auth.service.js";
 import { validateState, generateState } from "../utils/state";
 
-const pkseStore = new Map();
+const pkceStore = new Map();
 
 
 
@@ -14,7 +14,7 @@ const initiateGitHubAuth = (req, res) => {
     const codeChallenge = generateCodeChallenge(codeVerifier);
     const state = generateState();
 
-    pkseStore.set(state, codeVerifier);
+    pkceStore.set(state, codeVerifier);
 
     const authUrl = `${githubConfig.authorizationUrl}?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=${env.redirectUri}&scope=read:user&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
     res.redirect(authUrl);
@@ -28,7 +28,7 @@ const handleGitHubCallback = async (req, res) => {
             message: "Invalid state parameter",
         });
     }
-    const codeVerifier = pkseStore.get(state);
+    const codeVerifier = pkceStore.get(state);
 
     try{
         const accessToken = await getGitHubAccessToken(code, codeVerifier);
@@ -75,3 +75,5 @@ const logoutUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Error occurred while logging out" });
     }
 }
+
+export { initiateGitHubAuth, handleGitHubCallback, refreshAccessToken, logoutUser };

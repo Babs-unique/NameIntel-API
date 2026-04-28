@@ -1,6 +1,6 @@
 const checkRole = (requiredRole) => {
     return (req, res, next) => {
-        const userRole = req.headers.role; 
+        const userRole = req.user && req.user.role; 
         if (!userRole) {
             return res.status(401).json({
                 success: false,

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     github_id: {
         type: String,
         required: true,
+        unique: true
     },
     username: {
         type: String,

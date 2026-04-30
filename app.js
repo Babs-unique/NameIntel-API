@@ -34,7 +34,8 @@ app.use(express.json());
 app.use(cookieParser()); 
 app.use(morgan("dev"));
 app.use(cors({
-    origin: "*",
+    origin: process.env.CLIENT_URI || 'http://localhost:5173',
+    credentials: true
 }));
 app.use(checkVersion)
 app.use('/api/auth', authLimiter);

@@ -4,9 +4,18 @@ const generateCodeVerifier = () => {
     return crypto.randomBytes(32).toString('base64url');
 }
 
+const base64UrlEncode = (buffer) => {
+    return buffer
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+};
+
 const generateCodeChallenge = (codeVerifier) => {
-    const hash = crypto.createHash('sha256').update(codeVerifier).digest();
-    return hash.toString('base64url');
-}
+    return base64UrlEncode(
+        crypto.createHash('sha256').update(codeVerifier).digest()
+    );
+};
 
 export { generateCodeVerifier, generateCodeChallenge };

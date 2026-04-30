@@ -13,7 +13,12 @@ const getGitHubAccessToken = async (code, codeVerifier) => {
                 code: code,
                 redirect_uri: env.redirectUri,
                 code_verifier: codeVerifier
+            },{
+                headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Accept: "application/json"
             }
+        }
         )
         return response.data.access_token;
 

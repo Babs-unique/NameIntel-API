@@ -64,6 +64,7 @@ const handleGitHubCallback = async (req, res) => {
             data: authResult
         });
     } catch (error) {
+        console.error("Error in github callback", error)
         res.status(500).json({ success: false, message: "Error occurred while processing GitHub authentication" });
     }
 }

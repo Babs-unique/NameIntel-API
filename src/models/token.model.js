@@ -1,23 +1,22 @@
 import mongoose from "mongoose";
 
-
 const tokenSchema = new mongoose.Schema({
-    user_id: {
+    userId: {
         type: String,
         required: true,
     },
-    refresh_token: {
+    refreshToken: {
         type: String,
         required: true,
     },
-    expires_at: {
+    expiresAt: {
         type: Date,
         default: Date.now
     },
-    is_revoked: {
+    isRevoked: {
         type: Boolean,
         default: false
     }
-})
+});
 
 export default mongoose.model("Token", tokenSchema);

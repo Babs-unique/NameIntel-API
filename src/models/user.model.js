@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     id:{
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        default: () => new mongoose.Types.ObjectId().toString()
     },
     github_id: {
         type: String,

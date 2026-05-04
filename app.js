@@ -25,11 +25,7 @@ const githubOAuthLimiter = rateLimiter({
         message: "Too many authentication requests, please try again later"
     },
     standardHeaders: true,
-    legacyHeaders: false,
-    keyGenerator: (req, res) => {
-        // Use IP address and username if available
-        return req.ip || req.connection.remoteAddress;
-    }
+    legacyHeaders: false
 });
 
 // General auth rate limiter

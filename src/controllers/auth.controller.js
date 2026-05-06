@@ -217,7 +217,8 @@ const logoutUser = async (req, res) => {
                 message: "Refresh token is required" 
             });
         }
-
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
         await logout(refreshToken);
         return res.json({ 
             success: true, 

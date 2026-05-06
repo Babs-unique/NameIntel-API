@@ -92,12 +92,29 @@ const handleGitHubCallback = async (req, res) => {
         // CLEANUP AFTER SUCCESS
         deleteState(state);
 
+
+        //COOKIES
+
+        
+        res.cookie('accessToken', authResult.accessToken, {
+            httpOnly: true,
+            secure: true, //Remember to set this to true in production
+            sameSite: "none",
+            maxAge: 15 * 60 * 1000
+        })
+        res.cookie('refreshToken', authResult.refreshToken, {
+            httpOnly: true,
+            secure: true, //Remember to set this to true in production
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         // Return tokens to client
         return res.json({
             success: true,
             message: "Authentication successful",
-            access_token: authResult.accessToken,
-            refresh_token: authResult.refreshToken,
+            /* access_token: authResult.accessToken,
+            refresh_token: authResult.refreshToken, */
             user: {
                 id: authResult.user._id,
                 username: authResult.user.username,
@@ -161,11 +178,25 @@ const refreshAccessToken = async (req, res) => {
         }
 
         const newTokens = await refreshToken(oldRefreshToken);
+
+        res.cookie('accessToken', newTokens.accessToken, {
+            httpOnly: true,
+            secure: true, //Remember to set this to true in production
+            sameSite: "none",
+            maxAge: 15 * 60 * 1000
+        })
+
+        res.cookie('refreshToken', newTokens.refreshToken, {
+            httpOnly: true,
+            secure: true, //Remember to set this to true in production
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         return res.json({ 
             success: true, 
             message: "Access token refreshed successfully", 
-            access_token: newTokens.accessToken,
-            refresh_token: newTokens.refreshToken 
+        /*    access_token: newTokens.accessToken,
+            refresh_token: newTokens.refreshToken  */
         });
     } catch (error) {
         console.error("Error refreshing access token:", error);

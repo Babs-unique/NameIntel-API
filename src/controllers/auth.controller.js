@@ -98,13 +98,13 @@ const handleGitHubCallback = async (req, res) => {
         
         res.cookie('accessToken', authResult.accessToken, {
             httpOnly: true,
-            secure: true, //Remember to set this to true in production
+            secure: false, //Remember to set this to true in production
             sameSite: "none",
             maxAge: 15 * 60 * 1000
         })
         res.cookie('refreshToken', authResult.refreshToken, {
             httpOnly: true,
-            secure: true, //Remember to set this to true in production
+            secure: false, //Remember to set this to true in production
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
@@ -181,14 +181,14 @@ const refreshAccessToken = async (req, res) => {
 
         res.cookie('accessToken', newTokens.accessToken, {
             httpOnly: true,
-            secure: true, //Remember to set this to true in production
+            secure: false, //Remember to set this to true in production
             sameSite: "none",
             maxAge: 15 * 60 * 1000
         })
 
         res.cookie('refreshToken', newTokens.refreshToken, {
             httpOnly: true,
-            secure: true, //Remember to set this to true in production
+            secure: false, //Remember to set this to true in production
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });

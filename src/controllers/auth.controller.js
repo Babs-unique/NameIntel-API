@@ -109,12 +109,12 @@ const handleGitHubCallback = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        // Return tokens to client
+        /* // Return tokens to client
         return res.json({
             success: true,
             message: "Authentication successful",
-            /* access_token: authResult.accessToken,
-            refresh_token: authResult.refreshToken, */
+            access_token: authResult.accessToken,
+            refresh_token: authResult.refreshToken, 
             user: {
                 id: authResult.user._id,
                 username: authResult.user.username,
@@ -122,7 +122,7 @@ const handleGitHubCallback = async (req, res) => {
                 role: authResult.user.role,
                 avatar_url: authResult.user.avatar_url
             }
-        });
+        }); */
         return res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/insighta-web/auth/callback");
     } catch (error) {
         console.error("OAuth error:", error);

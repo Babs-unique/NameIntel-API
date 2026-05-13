@@ -10,6 +10,7 @@ const extractEnvVariables = () => {
         githubClientId: process.env.GITHUB_CLIENT_ID,
         githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
         redirectUri: process.env.GITHUB_REDIRECT_URI,
+        frontendUrl: process.env.FRONTEND_URL,
         jwtSecret: process.env.JWT_SECRET,
         jwtRefreshSecret: process.env.JWT_REFRESH_SECRET
     }

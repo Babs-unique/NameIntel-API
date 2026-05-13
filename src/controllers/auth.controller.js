@@ -123,7 +123,7 @@ const handleGitHubCallback = async (req, res) => {
                 avatar_url: authResult.user.avatar_url
             }
         });
-        res.redirect("http://localhost:5173/insighta-web/auth/callback");
+        return res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/insighta-web/auth/callback");
     } catch (error) {
         console.error("OAuth error:", error);
         deleteState(state);

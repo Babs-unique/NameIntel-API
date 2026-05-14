@@ -168,7 +168,7 @@ const getCurrentUser = async (req, res) => {
 
 const refreshAccessToken = async (req, res) => {
     try {
-        const oldRefreshToken = req.cookies.refreshToken;
+        const oldRefreshToken = req.cookies?.refreshToken;
         
         if (!oldRefreshToken) {
             return res.status(400).json({ 
@@ -209,9 +209,9 @@ const refreshAccessToken = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        const { refreshToken } = req.body;
-        
-        if (!refreshToken) {
+        const oldRefreshToken = req.cookies?.refreshToken;
+
+        if (!oldRefreshToken) {
             return res.status(400).json({ 
                 success: false, 
                 message: "Refresh token is required" 

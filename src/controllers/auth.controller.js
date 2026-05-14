@@ -4,6 +4,7 @@ import { generateCodeChallenge, generateCodeVerifier } from "../utils/pkce.js";
 import { getGitHubAccessToken, getGitHubUser } from "../services/github.service.js";
 import { userLogin, refreshToken, logout } from "../services/auth.service.js";
 import { generateState, getStateData, deleteState } from "../utils/state.js";
+import { getCookieOptions } from "../utils/cookieOptions.js";
 import User from "../models/user.model.js";
 
 const initiateGitHubAuth = (req, res) => {
@@ -96,18 +97,8 @@ const handleGitHubCallback = async (req, res) => {
         //COOKIES
 
         
-        res.cookie('accessToken', authResult.accessToken, {
-            httpOnly: true,
-            secure: false, //Remember to set this to true in production
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000
-        })
-        res.cookie('refreshToken', authResult.refreshToken, {
-            httpOnly: true,
-            secure: false, //Remember to set this to true in production
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie('accessToken', authResult.accessToken, getCookieOptions(req, 'access'));
+        res.cookie('refreshToken', authResult.refreshToken, getCookieOptions(req, 'refresh'));
 
         /* // Return tokens to client
         return res.json({
@@ -138,7 +129,6 @@ const handleGitHubCallback = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
     try {
-        console.log(req.user)
         if (!req.user || !req.user.userId) {
             return res.status(401).json({ 
                 success: false, 
@@ -180,19 +170,8 @@ const refreshAccessToken = async (req, res) => {
 
         const newTokens = await refreshToken(oldRefreshToken);
 
-        res.cookie('accessToken', newTokens.accessToken, {
-            httpOnly: true,
-            secure: false, //Remember to set this to true in production
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000
-        })
-
-        res.cookie('refreshToken', newTokens.refreshToken, {
-            httpOnly: true,
-            secure: false, //Remember to set this to true in production
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie('accessToken', newTokens.accessToken, getCookieOptions(req, 'access'));
+        res.cookie('refreshToken', newTokens.refreshToken, getCookieOptions(req, 'refresh'));
         return res.json({ 
             success: true, 
             message: "Access token refreshed successfully", 

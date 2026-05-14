@@ -13,6 +13,7 @@ import logger from "./src/middleware/logger.middleware.js";
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', true);
 connectDB();
 app.use(logger);
 

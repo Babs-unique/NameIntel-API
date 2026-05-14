@@ -168,7 +168,7 @@ const getCurrentUser = async (req, res) => {
 
 const refreshAccessToken = async (req, res) => {
     try {
-        const { refreshToken: oldRefreshToken } = req.body;
+        const oldRefreshToken = req.cookies.refreshToken;
         
         if (!oldRefreshToken) {
             return res.status(400).json({ 

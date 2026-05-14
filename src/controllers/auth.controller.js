@@ -138,6 +138,7 @@ const handleGitHubCallback = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
     try {
+        console.log(req.user)
         if (!req.user || !req.user.userId) {
             return res.status(401).json({ 
                 success: false, 
